@@ -1,0 +1,3 @@
+*bootstrap-datetimepicker.min.css linguist-vendored
+*.js linguist-vendored
+static/admin/* linguist-vendored

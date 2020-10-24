@@ -1,0 +1,87 @@
+{% extends "blog/base.html" %}
+{% load static %}
+{% block content %}
+
+<!-- Search form -->
+<!-- Display the search form only if there are posts to search in -->
+{% if posts or request.GET.search %}
+<div id="inputHomepage">
+  <form action="" method="get">
+    <input type="text" id="searchFieldHomepage" name="search" placeholder="Search" value="{{ request.GET.search }}">
+    <button type="submit" value="Search" id="searchButtonHomepage">
+      <div>
+        <img src="{% static 'blog/img/search.png' %}">
+      </div>
+    </button>
+  </form>
+</div>
+{% endif %}
+
+<div class="col-12 main_content">
+  <!-- Posts -->
+  {% if posts %}
+    {% for post in posts %}
+      <article>
+        <div>
+          <div class="article-datetime">
+            <p>{{ post.date_posted|date:"F j, Y, H:i" }}</p>
+          </div>
+          <div class="article-headline">
+            <a class="article-title" href="{% url 'post-detail' post.id %}">
+              {% if post.title %}{{post.title}}{% else %}{{ post.date_posted|date:"F j, Y, H:i" }}{% endif %}
+            </a>
+          </div>
+          <p class="article-content">{{ post.content }}</p>
+          {% if post.image %}<img src="{{ post.image.url}}" class="imageMain">{% endif %}
+          {% if post.audio %}<audio controls><source src="{{ post.audio.url}}" type="audio/mpeg"></audio>{% endif %}
+        </div>
+      </article>
+    {% endfor %}
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+
+      <div class="pagination">
+        {% if page_obj.has_previous %}
+        {% if page_obj.number > 2 %}
+        <a class="button rounded_button opacity_button" {% if request.GET.query %} href="?page=1&search={{ request.GET.search }}" {% else %} href="?page=1" {% endif %}>
+          <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-left" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="font-size:20px;vertical-align:middle;">
+            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+          </svg>
+          <span style="padding-left:3px;">First page</span>
+        </a>
+        {% endif %}
+        <a class="button rounded_button secondary_button" {% if request.GET.query %} href="?page={{ page_obj.previous_page_number }}&search={{ request.GET.search }}" {% else %} href="?page={{ page_obj.previous_page_number }}" {% endif %}>
+          <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-left" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="font-size:20px;vertical-align:middle;">
+            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+          </svg>
+          <span style="padding-left:3px;">Previous page</span>
+        </a>
+        {% endif %}
+        {% if page_obj.has_next %}
+        <a class="button rounded_button secondary_button" {% if request.GET.query %} href="?page={{ page_obj.next_page_number }}&search={{ request.GET.search }}" {% else %} href="?page={{ page_obj.next_page_number }}" {% endif %}>
+          <span style="padding-right:3px;">Next page</span>
+          <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-right" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="font-size:20px;vertical-align:middle;">
+            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+          </svg>
+        </a>
+        <a class="button rounded_button opacity_button" {% if request.GET.query %} href="?page={{ page_obj.paginator.num_pages }}&search={{ request.GET.search }}" {% else %} href="?page={{ page_obj.paginator.num_pages }}" {% endif %}>
+          <span style="padding-right:-3px;">Last page</span>
+          <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-right" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="font-size:20px;vertical-align:middle;">
+            <path fill-rule="evenodd" d="M10.146 4.646a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L12.793 8l-2.647-2.646a.5.5 0 0 1 0-.708z"/>
+            <path fill-rule="evenodd" d="M2 8a.5.5 0 0 1 .5-.5H13a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 8z"/>
+          </svg>
+        </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+  {% else %}
+    {% if request.GET.search %}
+      <p class="no_posts">No posts were found</p>
+    {% else %}
+      <p class="no_posts" style="margin-top:-40px;">No posts yet</p>
+    {% endif %}
+  {% endif %}
+</div>
+{% endblock content %}

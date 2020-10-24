@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Journal</title>
+<link rel="shortcut icon" href="{% static 'blog/img/favicon.png' %}" type="image/x-icon">
+
+<!-- Meta tags -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<!-- JavaScript files -->
+<script src="{% static 'blog/js/moment.min.js' %}"></script>
+<script src="{% static 'blog/js/jquery-2.1.1.min.js' %}"></script>
+<script src="{% static 'blog/js/bootstrap-datetimepicker.min.js' %}"></script>
+
+<!-- CSS files -->
+<link rel="stylesheet" href="{% static 'blog/css/bootstrap-datetimepicker.min.css' %}">
+<link rel="stylesheet" href="{% static 'blog/css/modified-bootstrap.min.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'blog/css/main.css' %}">
+
+</head>
+<body>
+
+<!-- Showing vertical navigation, if the user is logged in -->
+{% if user.is_authenticated and 'register' not in request.path and 'login' not in request.path %}
+
+  <div style="background-color:#ebebeb;" class="vertical_nav">
+    <a href="{% url 'blog-home' %}">
+      <img src="{% static 'blog/img/home.png' %}" style="top:30px;margin-left:20px;">
+    </a>
+    <a href="{% url 'post-create' %}">
+      <button class="nav_button" style="top:110px;margin-left:20px;height:30px;padding:0px;">
+        <span>+</span>
+      </button>
+    </a>
+    <a href="{% url 'logout' %}">
+      <img src="{% static 'blog/img/logout.png' %}" style="top:190px;margin-left:22.5px;">
+    </a>
+  </div>
+
+{% endif %}
+
+<div class="container">
+  <div {% if 'login' in request.path or 'logout' in request.path or 'register' in request.path %} class="row justify-content-center" {% else %} class="row justify-content-start" {% endif %}>
+
+    <!-- Notifications -->
+    {% if message %}
+    <div {% if 'logout' in request.path %} class="alert alert-{{ tag }} col-12 col-sm-7 col-md-12 col-lg-12" {% else %} class="alert alert-{{ tag }} col-12" {% endif %} style="margin-bottom:20px;margin-top:-25px;">
+      {{ message }}
+    </div>
+    {% elif request.GET.account == 'success' %}
+    <div class="alert alert-success col-12" style="margin-bottom:60px;margin-top:-25px;">
+      Your account has been successfully created!
+    </div>
+    {% endif %}
+
+    <!-- Main content -->
+    {% block content %}
+    {% endblock %}
+
+  </div>
+</div>
+
+</body>
+</html>

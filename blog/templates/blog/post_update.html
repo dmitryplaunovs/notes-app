@@ -1,0 +1,322 @@
+{% extends "blog/base.html" %}
+{% block content %}
+
+<!-- A popup for date and time selection -->
+<script>
+  $(function () {
+    $('#id_date_posted').datetimepicker({
+    format: 'YYYY-MM-DD HH:mm:ss',
+    //debug:true,
+    icons: {
+      time: "icon_time",
+      date: "icon_date",
+      up: "icon_up",
+      down: "icon_down",
+      next: "icon_right",
+      previous: "icon_left"
+    }
+  });
+ });
+</script>
+
+<div class="col-12" style="padding:0px;">
+  <div class="content-section">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="article-form">
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="form-type">Update</div>
+
+        <!-- If the form was already submitted -->
+        {% if form.is_bound %}
+
+        {% if form.title.errors %}
+          <input name="title" type="text" class="is-invalid" id="id_title" value="{{ form.title.value|default_if_none:'' }}" placeholder="Title" style="margin-top:10px;">
+          <!--
+          form.field.value is a value of a form.
+          object.field is a validated and saved value of a form.
+          -->
+          {% for error in form.title.errors %}
+            <div class="invalid-feedback">
+              {{ error }}
+            </div>
+          {% endfor %}
+        {% else %}
+          <input name="title" type="text" class="is-valid" id="id_title" value="{{ form.title.value|default_if_none:'' }}" placeholder="Title" style="margin-top:10px;">
+        {% endif %}
+
+        {% if form.content.errors %}
+          <textarea name="content" cols="40" rows="5" class="textarea is-invalid" required="" id="id_content" value="" placeholder="Message (required)" style="margin-top:20px;">{{ form.content.value|default_if_none:'' }}</textarea>
+          {% for error in form.content.errors %}
+            <div class="invalid-feedback">
+              {{ error }}
+            </div>
+          {% endfor %}
+        {% else %}
+          <textarea name="content" cols="40" rows="5" class="textarea is-valid" required="" id="id_content" value="" placeholder="Message (required)" style="margin-top:20px;">{{ form.content.value|default_if_none:'' }}</textarea>
+        {% endif %}
+
+        {% if form.date_posted.errors %}
+          <input name="date_posted" type="text" class="is-invalid" id="id_date_posted" value="{{ object.date_posted|date:'Y-m-d G:i:s' }}" style="margin-top:20px;">
+          {% for error in form.date_posted.errors %}
+            <div class="invalid-feedback">
+              {{ error }}
+            </div>
+          {% endfor %}
+        {% else %}
+          <input name="date_posted" type="text" class="is-valid" id="id_date_posted" value="{{ object.date_posted|date:'Y-m-d G:i:s' }}" style="margin-top:20px;">
+        {% endif %}
+
+        {% if form.image.errors %}
+          {% if object.image %}
+            <div style="position:relative;z-index:3;margin-bottom:10px;max-width:500px;max-height:500px;width:auto;height:auto;margin-top:20px;" class="removeImageContainer" id="removeImageContainer" onclick="imageRemove()">
+              <img src="{{object.image.url}}" id="image_preview" style="max-width:500px;max-height:500px;width:auto;height:auto;">
+              <span id="imageRemoveButton">
+                <svg width="40px" height="40px" viewBox="0 0 24 24" style="color:rgb(52, 52, 52);fill:currentcolor;"><path d="M20 5h-3.92a4.22 4.22 0 0 0-3.89-3 4.14 4.14 0 0 0-4.32 3H4a2 2 0 0 0-2 2v1.5a2 2 0 0 0 2 2V20a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9.5a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm-7.87-1.5A2.76 2.76 0 0 1 14.49 5h-5a2.82 2.82 0 0 1 2.64-1.5zM18.5 20a.5.5 0 0 1-.5.5H6a.5.5 0 0 1-.5-.5v-9.5h13zm2-11.5a.5.5 0 0 1-.5.5H4a.5.5 0 0 1-.5-.5V7a.5.5 0 0 1 .5-.5h16a.5.5 0 0 1 .5.5zM9 19a.76.76 0 0 1-.75-.75v-5.5a.75.75 0 0 1 1.5 0v5.5A.76.76 0 0 1 9 19zm6 0a.76.76 0 0 1-.75-.75v-5.5a.75.75 0 0 1 1.5 0v5.5A.76.76 0 0 1 15 19z"></path></svg>
+              </span>
+            </div>
+          {% endif %}
+          <label class="fileContainer" id="fileSelectBox" ondragover="dragOver(event,this)" ondragleave="leaveDrop(this)" ondrop="onDrop(event,this)">
+            <div style="overflow:hidden;text-align:center;">
+              <div class="dragDropIcon">
+                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-card-image" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 0 0-.5.5v9c0 .013 0 .027.002.04V12l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094L15 9.499V3.5a.5.5 0 0 0-.5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13zm4.502 3.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                </svg>
+              </div>
+              <div class="fileContainerFileName fileName" ondrop="onDrop(event)" id="fileName"><span style="color:rgb(73,80,87);">{% if object.image %}Replace the image with another one{% else %}Drag and drop an image here{% endif %}</span></div>
+              <div class="fileContainerFileName fileNameDrop" ondrop="onDrop(event)" id="fileNameDrop" style="display:none;"><span style="color:rgb(73,80,87);">Drop it</span></div>
+            </div>
+            <input accept="image/*" name="image" id="id_image" {% if object.image %} onchange="fileContainerReplaceFile(event,this,'image-clear_id')" {% else %} onchange="fileContainerChangeFile(event,this,'image-clear_id')" {% endif %} style="margin-top:25px;" type="file"/>
+          </label>
+          <input type="checkbox" name="image-clear" id="image-clear_id" style="display:none;">
+          {% for error in form.image.errors %}
+            <div class="invalid-feedback">
+              {{ error }}
+            </div>
+          {% endfor %}
+
+        {% else %}
+
+          {% if object.image %}
+            <div style="position:relative;z-index:3;margin-bottom:10px;max-width:500px;max-height:500px;width:auto;height:auto;margin-top:20px;" class="removeImageContainer" id="removeImageContainer" onclick="imageRemove()">
+              <img src="{{object.image.url}}" id="image_preview" style="max-width:500px;max-height:500px;width:auto;height:auto;">
+              <span id="imageRemoveButton">
+                <svg width="40px" height="40px" viewBox="0 0 24 24" style="color:rgb(52, 52, 52);fill:currentcolor;"><path d="M20 5h-3.92a4.22 4.22 0 0 0-3.89-3 4.14 4.14 0 0 0-4.32 3H4a2 2 0 0 0-2 2v1.5a2 2 0 0 0 2 2V20a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9.5a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm-7.87-1.5A2.76 2.76 0 0 1 14.49 5h-5a2.82 2.82 0 0 1 2.64-1.5zM18.5 20a.5.5 0 0 1-.5.5H6a.5.5 0 0 1-.5-.5v-9.5h13zm2-11.5a.5.5 0 0 1-.5.5H4a.5.5 0 0 1-.5-.5V7a.5.5 0 0 1 .5-.5h16a.5.5 0 0 1 .5.5zM9 19a.76.76 0 0 1-.75-.75v-5.5a.75.75 0 0 1 1.5 0v5.5A.76.76 0 0 1 9 19zm6 0a.76.76 0 0 1-.75-.75v-5.5a.75.75 0 0 1 1.5 0v5.5A.76.76 0 0 1 15 19z"></path></svg>
+              </span>
+            </div>
+          {% endif %}
+          <label class="fileContainer" id="fileSelectBox" ondragover="dragOver(event,this)" ondragleave="leaveDrop(this)" ondrop="onDrop(event,this)" style="margin-top:20px;">
+            <div style="overflow:hidden;text-align:center;">
+              <div class="dragDropIcon">
+                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-card-image" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 0 0-.5.5v9c0 .013 0 .027.002.04V12l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094L15 9.499V3.5a.5.5 0 0 0-.5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13zm4.502 3.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                </svg>
+              </div>
+              <div class="fileContainerFileName fileName" ondrop="onDrop(event)" id="fileName"><span style="color:rgb(73,80,87);">{% if object.image %}Replace the image with another one{% else %}Drag and drop an image here{% endif %}</span></div>
+              <div class="fileContainerFileName fileNameDrop" ondrop="onDrop(event)" id="fileNameDrop" style="display:none;"><span style="color:rgb(73,80,87);">Drop it</span></div>
+            </div>
+            <input accept="image/*" name="image" id="id_image" {% if object.image %} onchange="fileContainerReplaceFile(event,this,'image-clear_id')" {% else %} onchange="fileContainerChangeFile(event,this,'image-clear_id')" {% endif %} style="margin-top:25px;" type="file"/>
+          </label>
+          <input type="checkbox" name="image-clear" id="image-clear_id" style="display:none;">
+
+        {% endif %}
+
+        {% if form.audio.errors %}
+          {% if object.audio %}<audio controls {% if object.image %} style="margin-top:200px;" {% else %} style="margin-top:190px;" {% endif %}><source src="{{ object.audio.url}}" type="audio/mpeg"></audio>{% endif %}
+          <label class="fileContainer" style="margin-top:20px;" ondragover="dragOver(event,this)" ondragleave="leaveDrop(this)" ondrop="onDrop(event,this)">
+            <div style="overflow:hidden;text-align:center;">
+              <div class="dragDropIcon">
+                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-file-music" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M4 0h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H4z"/>
+                  <path fill-rule="evenodd" d="M10.304 3.13a1 1 0 0 1 1.196.98v1.8l-2.5.5v5.09c0 .495-.301.883-.662 1.123C7.974 12.866 7.499 13 7 13c-.5 0-.974-.134-1.338-.377-.36-.24-.662-.628-.662-1.123s.301-.883.662-1.123C6.026 10.134 6.501 10 7 10c.356 0 .7.068 1 .196V4.41a1 1 0 0 1 .804-.98l1.5-.3z"/>
+                </svg>
+              </div>
+              <div class="fileContainerFileName fileName" ondrop="onDrop(event)"><span style="color:rgb(73,80,87);">Drag and drop an audio file here</span></div>
+              <div class="fileContainerFileName fileNameDrop" ondrop="onDrop(event)" style="display:none;"><span style="color:rgb(73,80,87);">Drop it</span></div>
+            </div>
+            <input accept="audio/*" name="audio" id="id_audio" onchange="fileContainerChangeFile(event,this,'audio-clear_id')" style="margin-top:25px;" type="file"/>
+          </label>
+          <input type="checkbox" name="audio-clear" id="audio-clear_id" style="display:none;">
+
+          {% if form.audio.errors %}
+            {% for error in form.audio.errors %}
+              <div class="invalid-feedback">
+                {{ error }}
+              </div>
+            {% endfor %}
+          {% endif %}
+
+        {% else %}
+
+          {% if object.audio %}<audio controls {% if object.image %} style="margin-top:200px;" {% else %} style="margin-top:190px;" {% endif %}><source src="{{ object.audio.url}}" type="audio/mpeg"></audio>{% endif %}
+          <label class="fileContainer" style="margin-top:20px;" ondragover="dragOver(event,this)" ondragleave="leaveDrop(this)" ondrop="onDrop(event,this)">
+            <div style="overflow:hidden;text-align:center;">
+              <div class="dragDropIcon">
+                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-file-music" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M4 0h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H4z"/>
+                  <path fill-rule="evenodd" d="M10.304 3.13a1 1 0 0 1 1.196.98v1.8l-2.5.5v5.09c0 .495-.301.883-.662 1.123C7.974 12.866 7.499 13 7 13c-.5 0-.974-.134-1.338-.377-.36-.24-.662-.628-.662-1.123s.301-.883.662-1.123C6.026 10.134 6.501 10 7 10c.356 0 .7.068 1 .196V4.41a1 1 0 0 1 .804-.98l1.5-.3z"/>
+                </svg>
+              </div>
+              <div class="fileContainerFileName fileName" ondrop="onDrop(event)"><span style="color:rgb(73,80,87);">Drag and drop an audio file here</span></div>
+              <div class="fileContainerFileName fileNameDrop" ondrop="onDrop(event)" style="display:none;"><span style="color:rgb(73,80,87);">Drop it</span></div>
+            </div>
+            <input accept="audio/*" name="audio" id="id_audio" onchange="fileContainerChangeFile(event,this,'audio-clear_id')" style="margin-top:25px;" type="file"/>
+          </label>
+          <input type="checkbox" name="audio-clear" id="audio-clear_id" style="display:none;">
+
+        {% endif %}
+
+        {% else %}
+
+        <input name="title" type="text" id="id_title" value="{{ form.title.value|default_if_none:'' }}" placeholder="Title" style="margin-top:10px;">
+
+        <textarea name="content" cols="40" rows="5" class="textarea" id="id_content" value="" style="margin-top:20px;" placeholder="Message (required)">{{ form.content.value|default_if_none:'' }}</textarea>
+
+        <input name="date_posted" type="text" required="" id="id_date_posted" value="{{ form.date_posted.value|default_if_none:''|date:"Y-m-d G:i:s" }}" style="margin-top:20px;">
+
+        {% if object.image %}
+        <div style="position:relative;z-index:3;margin-bottom:10px;max-width:500px;max-height:500px;width:auto;height:auto;margin-top:20px;" class="removeImageContainer" id="removeImageContainer" onclick="imageRemove()">
+          <img src="{{object.image.url}}" id="image_preview" style=";max-width:500px;max-height:500px;width:auto;height:auto;">
+          <span id="imageRemoveButton">
+            <svg width="40px" height="40px" viewBox="0 0 24 24" style="color:rgb(52, 52, 52);fill:currentcolor;">
+              <path d="M20 5h-3.92a4.22 4.22 0 0 0-3.89-3 4.14 4.14 0 0 0-4.32 3H4a2 2 0 0 0-2 2v1.5a2 2 0 0 0 2 2V20a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9.5a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm-7.87-1.5A2.76 2.76 0 0 1 14.49 5h-5a2.82 2.82 0 0 1 2.64-1.5zM18.5 20a.5.5 0 0 1-.5.5H6a.5.5 0 0 1-.5-.5v-9.5h13zm2-11.5a.5.5 0 0 1-.5.5H4a.5.5 0 0 1-.5-.5V7a.5.5 0 0 1 .5-.5h16a.5.5 0 0 1 .5.5zM9 19a.76.76 0 0 1-.75-.75v-5.5a.75.75 0 0 1 1.5 0v5.5A.76.76 0 0 1 9 19zm6 0a.76.76 0 0 1-.75-.75v-5.5a.75.75 0 0 1 1.5 0v5.5A.76.76 0 0 1 15 19z"></path>
+            </svg>
+          </span>
+        </div>
+        {% endif %}
+
+        <label class="fileContainer" ondragover="dragOver(event,this)" ondragleave="leaveDrop(this)" ondrop="onDrop(event,this)" style="margin-top:20px;">
+          <div style="overflow:hidden;text-align:center;">
+            <div class="dragDropIcon">
+              <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-card-image" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 0 0-.5.5v9c0 .013 0 .027.002.04V12l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094L15 9.499V3.5a.5.5 0 0 0-.5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13zm4.502 3.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+              </svg>
+            </div>
+            <div class="fileContainerFileName fileName" ondrop="onDrop(event)" id="fileName">
+              <span style="color:rgb(73,80,87);">
+                {% if object.image %}Replace the image with another one{% else %}Drag and drop an image here{% endif %}
+              </span>
+            </div>
+            <div class="fileContainerFileName fileNameDrop" ondrop="onDrop(event)" id="fileNameDrop" style="display:none;"><span style="color:rgb(73,80,87);">Drop it</span></div>
+          </div>
+          <input accept="image/*" name="image" id="id_image" {% if object.image %} onchange="fileContainerReplaceFile(event,this,'image-clear_id')" {% else %} onchange="fileContainerChangeFile(event,this,'image-clear_id')" {% endif %} style="margin-top:25px;" type="file"/>
+        </label>
+        <input type="checkbox" name="image-clear" id="image-clear_id" style="display:none;">
+
+        {% if object.audio %}<audio controls {% if object.image %} style="margin-top:200px;" {% else %} style="margin-top:190px;" {% endif %}><source src="{{ object.audio.url}}" type="audio/mpeg"></audio>{% endif %}
+
+        <label class="fileContainer" style="margin-top:20px;" ondragover="dragOver(event,this)" ondragleave="leaveDrop(this)" ondrop="onDrop(event,this)">
+          <div style="overflow:hidden;text-align:center;">
+            <div class="dragDropIcon">
+              <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-file-music" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M4 0h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H4z"/>
+                <path fill-rule="evenodd" d="M10.304 3.13a1 1 0 0 1 1.196.98v1.8l-2.5.5v5.09c0 .495-.301.883-.662 1.123C7.974 12.866 7.499 13 7 13c-.5 0-.974-.134-1.338-.377-.36-.24-.662-.628-.662-1.123s.301-.883.662-1.123C6.026 10.134 6.501 10 7 10c.356 0 .7.068 1 .196V4.41a1 1 0 0 1 .804-.98l1.5-.3z"/>
+              </svg>
+            </div>
+            <div class="fileContainerFileName fileName" ondrop="onDrop(event)">
+              <span style="color:rgb(73,80,87);">
+                {% if object.audio %}Replace the audio file with another one{% else %}Drag and drop an audio file here{% endif %}
+              </span>
+            </div>
+            <div class="fileContainerFileName fileNameDrop" ondrop="onDrop(event)" style="display:none;"><span style="color:rgb(73,80,87);">Drop it</span></div>
+          </div>
+          <input accept="audio/*" name="audio" id="id_audio" onchange="fileContainerChangeFile(event,this,'audio-clear_id')" style="margin-top:25px;" type="file"/>
+        </label>
+        <input type="checkbox" name="audio-clear" id="audio-clear_id" style="display:none;">
+
+        {% endif %}
+
+      </div>
+
+      <button type="submit" class="button secondary_button short_button" style="margin-top:35px;margin-bottom:25px;">Save</button>
+      <!-- Returning non-field errors. -->
+      {% if form.errors %}
+        {% for error in form.non_field_errors %}
+          <p>{{ error }}</p>
+        {% endfor %}
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+<!-- Removing uploaded images -->
+<script>
+function imageRemove() {
+    document.getElementById('image-clear_id').checked = true;
+    document.getElementById('imageRemoveButton').innerHTML = 'This image was removed';
+    document.getElementById('fileName').children[0].innerHTML = 'Add another image'
+    document.getElementById('removeImageContainer').classList.remove('removeImageContainer');
+    document.getElementById('image_preview').style.opacity=0.1;
+    document.getElementById('imageRemoveButton').style.opacity=1.0;
+    document.getElementById('id_image').setAttribute('onchange','fileContainerChangeFile(event);');
+}
+</script>
+
+<!-- Drag and drop functionality -->
+<script>
+//var droppedFiles = null;
+function fileContainerChangeFile(e,element,id) {
+	element.parentElement.classList.remove('fileContainerDragOver');
+	try {
+		//droppedFiles = document.getElementById('id_image').files;
+		element.previousElementSibling.getElementsByClassName('fileName')[0].textContent = "Done! It's added.";
+    document.getElementById(id).checked = false;
+	} catch (error) {}
+	try {
+		aName = element.value;
+		if (aName !== '') {
+		}
+	} catch (error) {}
+}
+
+function fileContainerReplaceFile(e,element,id) {
+  document.element.parentElement.classList.remove('fileContainerDragOver');
+  try {
+    //droppedFiles = document.getElementById('id_image').files;
+    element.previousElementSibling.getElementsByClassName('fileName')[0].textContent = 'Done! The file is replaced!';
+    document.getElementById('removeImageContainer').classList.remove('removeImageContainer');
+    document.getElementById('image_preview').style.opacity=0.1;
+    document.getElementById('image_preview').style.cursor='default';
+    document.getElementById(id).checked = false;
+  } catch (error) {}
+  try {
+    aName = element.value;
+    if (aName !== '') {
+    }
+  } catch (error) {}
+}
+
+function onDrop(e,element) {
+	element.classList.remove('fileContainerDragOver');
+	try {
+	//	droppedFiles = e.dataTransfer.files;
+	//	element.getElementsByClassName('fileName')[0].textContent = droppedFiles[0].name;
+    element.getElementsByClassName('fileName')[0].style.display = "inline-block";
+    element.getElementsByClassName('fileNameDrop')[0].style.display = "none";
+	} catch (error) {}
+}
+
+function dragOver(e,element) {
+	element.classList.add('fileContainerDragOver');
+  element.getElementsByClassName('fileName')[0].style.display = "none";
+  element.getElementsByClassName('fileNameDrop')[0].style.display = "inline-block";
+	e.preventDefault();
+	e.stopPropagation();
+}
+
+function leaveDrop(element) {
+	element.classList.remove('fileContainerDragOver');
+  element.getElementsByClassName('fileName')[0].style.display = "inline-block";
+  element.getElementsByClassName('fileNameDrop')[0].style.display = "none";
+}
+</script>
+
+{% endblock content %}

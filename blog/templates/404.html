@@ -1,0 +1,15 @@
+{% extends "blog/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="error_section">
+  <img src="{% static 'blog/img/missing.png' %}" class="error_page_icon">
+  <p>This page doesn't exist.</p>
+  <div class="error_action">
+    <a href="/">
+      <button class="button secondary_button" style="width:200px;">Return to homepage</button>
+    </a>
+  </div>
+</div>
+
+{% endblock content %}

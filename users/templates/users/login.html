@@ -1,0 +1,28 @@
+{% extends "blog/base.html" %}
+{% block content %}
+
+<div class="col-12 col-sm-7 col-md-6 col-lg-5" style="padding:0px;margin-bottom:15px;">
+  <div class="content-section">
+    <form method="POST">
+      {% if form.non_field_errors %}
+      <div class="alert alert-block alert-danger">
+        {{ form.non_field_errors.0 }}
+      </div>
+      {% endif %}
+      {% csrf_token %}
+      <div class="auth_headline">
+        <p>Login</p>
+      </div>
+      <input id="id_username" name="username" placeholder="Username" class="auth_input" type="text" autocomplete="username" required autofocus>
+      <input id="id_password" name="password" placeholder="Password" class="auth_input" type="password" autocomplete="current-password" required>
+      <button class="button auth_button" type="submit">Log in</button>
+    </form>
+    <div style="padding-top:1rem;margin-top:10px;">
+      <div class="auth_note">
+        Need An Account? <a style="margin-left:4px;color:#009b72;" href="{% url 'register' %}">Sign Up Now</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,15 @@
+{% extends "blog/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="error_section">
+  <img src="{% static 'blog/img/forbidden.png' %}" class="error_page_icon">
+  <p>Oh no! It looks like you don't have<br> the necessary rights to view or edit this page.</p>
+  <div class="error_action">
+    <a href="/">
+      <button class="button secondary_button" style="width:200px;">Return to homepage</button>
+    </a>
+  </div>
+</div>
+
+{% endblock content %}
