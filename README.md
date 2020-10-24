@@ -21,6 +21,14 @@ A simple [web application](https://medium.com/@essentialdesign/website-vs-web-ap
 You will need to run a local server every time you want to launch the app (repeating the steps 2, 4 and 5), but for a quicker access you can create a shortcut that will do all these steps just on a single click.
 If you deploy the app to a web server, then it will run automatically on its web address.
 
+## Notes or blog
+
+Depending on whether users should be able to see or modify other users' posts (if the application is deployed on a web server), this app can be easily converted between a blog and a note-taking app.
+
+To do this, there are 2 files where some lines of code need to be commented out and some uncommented (also explained in comments): 
+- `blog/views.py`
+- `blog/templates/blog/post_detail.html`
+
 ## Django topics covered
 
 - Authentication
