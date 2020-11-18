@@ -6,7 +6,7 @@ A simple [web application](https://medium.com/@essentialdesign/website-vs-web-ap
 
 ## Requirements
 
-- Python version 3.6+ or higher to run a Python server on your device ([download here](https://www.python.org/downloads/))
+- Python version 3.6+ to run a Python server on your device ([download here](https://www.python.org/downloads/))
 
 ## How to install
 
